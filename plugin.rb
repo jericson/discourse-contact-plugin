@@ -4,7 +4,7 @@
 # name:discourse-contact-plugin
 # about: Add a contact form
 # meta_topic_id: 305462
-# version: 0.2.0
+# version: 0.3.0
 # authors: Jon Ericson
 # url: https://github.com/jericson/discourse-contact-plugin
 # required_version: 2.7.0

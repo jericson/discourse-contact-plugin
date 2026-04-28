@@ -52,6 +52,7 @@ It could be quite odd to have contact forms sprouting up hither and yon, so you 
 
 ### CHANGELOG
 * April 25, 2024: Alpha release.
+* April 28, 2026: Updated to .gjs file format.
  
 ### TODO
 * I'd like to set up tests to make sure nothing breaks when I make changes. I particularly want to verify that people without accounts can submit their data.

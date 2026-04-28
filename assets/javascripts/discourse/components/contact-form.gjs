@@ -48,7 +48,7 @@ export default class ContactForm extends Component {
     //  console.log("createContact");
 
     contactRecord.save().then((result) => {
-      this.contacts.pushObject(result.target);
+      this.contacts.push(result.target);
     });
 
     //    this.set("sent", "true");
