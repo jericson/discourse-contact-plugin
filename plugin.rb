@@ -13,11 +13,11 @@ enabled_site_setting :contact_form_enabled
 
 register_asset "stylesheets/contact.scss"
 
-module ::MyPluginModule
+module ::DiscourseContactPlugin
   PLUGIN_NAME = "discourse-contact-plugin"
 end
 
-require_relative "lib/contact/engine"
+require_relative "./lib/contact/engine"
 
 require_relative File.expand_path("../lib/contact/contact_store.rb", __FILE__)
 
