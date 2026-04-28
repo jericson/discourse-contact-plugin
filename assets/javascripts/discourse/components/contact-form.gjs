@@ -26,7 +26,7 @@ export default class ContactForm extends Component {
   fetchContacts() {
     this.store.findAll("contact").then((result) => {
       for (const contact of result.content) {
-        this.contacts.pushObject(contact);
+        this.contacts.push(contact);
       }
     });
   }
