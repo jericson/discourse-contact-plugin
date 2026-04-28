@@ -1,4 +1,5 @@
 import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
 import Form from "discourse/components/form";
@@ -6,6 +7,8 @@ import { i18n } from "discourse-i18n";
 
 export default class ContactForm extends Component {
   @service store;
+
+  @tracked submitted = false;
 
   constructor(owner, args) {
     super(owner, args);
@@ -34,6 +37,7 @@ export default class ContactForm extends Component {
     //      console.log(data.name);
     //      console.log(this.contacts);
     this.createContact(data.name, data.email, data.phone, data.message);
+    this.submitted = true;
   }
 
   createContact(name, email, phone, message) {
@@ -61,45 +65,53 @@ export default class ContactForm extends Component {
   }
 
   <template>
-    <Form @onSubmit={{this.handleSubmit}} as |form|>
-      <form.Field
-        @name="name"
-        @title={{i18n "contact.create_contact.text_name_label"}}
-        @type="input-text"
-        as |field|
-      >
-        <field.Control />
-      </form.Field>
+    {{#if this.submitted}}
+      <Form as |form|>
+        <form.Alert @type="success" @icon="check-circle">
+          Thank you for your message.
+        </form.Alert>
+      </Form>
+    {{else}}
+      <Form @onSubmit={{this.handleSubmit}} as |form|>
+        <form.Field
+          @name="name"
+          @title={{i18n "contact.create_contact.text_name_label"}}
+          @type="input-text"
+          as |field|
+        >
+          <field.Control />
+        </form.Field>
 
-      <form.Field
-        @name="email"
-        @title={{i18n "contact.create_contact.text_email_label"}}
-        @type="input-email"
-        @validation="required"
-        as |field|
-      >
-        <field.Control />
-      </form.Field>
+        <form.Field
+          @name="email"
+          @title={{i18n "contact.create_contact.text_email_label"}}
+          @type="input-email"
+          @validation="required"
+          as |field|
+        >
+          <field.Control />
+        </form.Field>
 
-      <form.Field
-        @name="phone"
-        @title={{i18n "contact.create_contact.text_phone_label"}}
-        @type="input-tel"
-        as |field|
-      >
-        <field.Control />
-      </form.Field>
+        <form.Field
+          @name="phone"
+          @title={{i18n "contact.create_contact.text_phone_label"}}
+          @type="input-tel"
+          as |field|
+        >
+          <field.Control />
+        </form.Field>
 
-      <form.Field
-        @name="message"
-        @title={{i18n "contact.create_contact.text_message_label"}}
-        @type="textarea"
-        as |field|
-      >
-        <field.Control @height={{120}} />
-      </form.Field>
+        <form.Field
+          @name="message"
+          @title={{i18n "contact.create_contact.text_message_label"}}
+          @type="textarea"
+          as |field|
+        >
+          <field.Control @height={{120}} />
+        </form.Field>
 
-      <form.Submit @translatedLabel="Send" />
-    </Form>
+        <form.Submit @translatedLabel="Send" />
+      </Form>
+    {{/if}}
   </template>
 }
