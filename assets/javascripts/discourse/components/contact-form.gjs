@@ -1,17 +1,23 @@
 import Component from "@glimmer/component";
-import { Input, Textarea } from "@ember/component";
-import { fn } from "@ember/helper";
-import { on } from "@ember/modifier";
 import { action } from "@ember/object";
+import { service } from "@ember/service";
+import Form from "discourse/components/form";
 import { i18n } from "discourse-i18n";
 
 export default class ContactForm extends Component {
+  @service store;
+
+  constructor(owner, args) {
+    super(owner, args);
+
+    this.init();
+  }
+
   init() {
-    super.init();
-    this.set("contacts", []);
+    this.contacts = [];
     /* TODO: I've disabled the /contacts route to avoid leaking user data. */
     this.fetchContacts();
-    this.set("sent", "");
+    //    this.set("sent", "");
   }
 
   fetchContacts() {
@@ -23,6 +29,13 @@ export default class ContactForm extends Component {
   }
 
   @action
+  handleSubmit(data) {
+    // data = { name, email, phone, message }
+    //      console.log(data.name);
+    //      console.log(this.contacts);
+    this.createContact(data.name, data.email, data.phone, data.message);
+  }
+
   createContact(name, email, phone, message) {
     const contactRecord = this.store.createRecord("contact", {
       id: Date.now(),
@@ -32,11 +45,13 @@ export default class ContactForm extends Component {
       message,
     });
 
+    //  console.log("createContact");
+
     contactRecord.save().then((result) => {
       this.contacts.pushObject(result.target);
     });
 
-    this.set("sent", "true");
+    //    this.set("sent", "true");
   }
 
   deleteContact(contact) {
@@ -46,46 +61,45 @@ export default class ContactForm extends Component {
   }
 
   <template>
-    <form
-      {{on
-        "submit"
-        (fn this.createContact this.name this.email this.phone this.message)
-      }}
-      class="contact"
-      id="contact-form"
-    >
-      <label>
-        {{i18n "contact.create_contact.text_name_label"}}
-        {{Input
-          required="required"
-          class="form-control"
-          type="text"
-          value=this.name
-        }}
-      </label>
+    <Form @onSubmit={{this.handleSubmit}} as |form|>
+      <form.Field
+        @name="name"
+        @title={{i18n "contact.create_contact.text_name_label"}}
+        @type="input-text"
+        as |field|
+      >
+        <field.Control />
+      </form.Field>
 
-      <label>
-        {{i18n "contact.create_contact.text_email_label"}}
-        {{Input required=true type="text" value=this.email}}
-      </label>
+      <form.Field
+        @name="email"
+        @title={{i18n "contact.create_contact.text_email_label"}}
+        @type="input-email"
+        @validation="required"
+        as |field|
+      >
+        <field.Control />
+      </form.Field>
 
-      <label>
-        {{i18n "contact.create_contact.text_phone_label"}}
-        {{Input type="text" value=this.phone}}
-      </label>
+      <form.Field
+        @name="phone"
+        @title={{i18n "contact.create_contact.text_phone_label"}}
+        @type="input-tel"
+        as |field|
+      >
+        <field.Control />
+      </form.Field>
 
-      <label>
-        {{i18n "contact.create_contact.text_message_label"}}
-        {{Textarea value=this.message}}
-      </label>
+      <form.Field
+        @name="message"
+        @title={{i18n "contact.create_contact.text_message_label"}}
+        @type="textarea"
+        as |field|
+      >
+        <field.Control @height={{120}} />
+      </form.Field>
 
-      {{#if this.sent}}
-        <p class="thanks">Thanks! We'll contact you soon.</p>
-      {{else}}
-        <button type="submit" class="btn btn-primary">
-          {{i18n "contact.create_contact.submit_label"}}
-        </button>
-      {{/if}}
-    </form>
+      <form.Submit @translatedLabel="Send" />
+    </Form>
   </template>
 }
