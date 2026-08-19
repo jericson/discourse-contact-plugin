@@ -2,8 +2,7 @@
 class ContactsController < ApplicationController
   requires_plugin "discourse-contact-plugin"
 
-  #  requires_login
-  before_action :ensure_admin, only: %i[index destroy]
+  before_action :ensure_admin_or_not_found, only: %i[index destroy]
 
   skip_before_action :check_xhr,
                      :verify_authenticity_token,
@@ -71,6 +70,13 @@ Message:
   end
 
   private
+
+  # Signed-out visitors get a 404 (hiding that the route exists) while
+  # signed-in non-admins get the usual 403 for lacking access.
+  def ensure_admin_or_not_found
+    raise Discourse::NotFound if current_user.blank?
+    ensure_admin
+  end
 
   # Collapse embedded CR/LF characters so untrusted input can't terminate a
   # header line early and inject additional headers (e.g. Bcc:) into @mail.

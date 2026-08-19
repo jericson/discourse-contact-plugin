@@ -60,7 +60,8 @@ RSpec.describe ContactsController do
       put "/contacts/new.json", params: { contact: malicious_params }
 
       expect(response.status).to eq(200)
-      header_lines = sent_mail.first.split(/\r?\n\r?\n/, 2).first.lines.map(&:strip).reject(&:blank?)
+      header_lines =
+        sent_mail.first.split(/\r?\n\r?\n/, 2).first.lines.map(&:strip).reject(&:blank?)
 
       # The injected "Bcc:" text must stay folded into the From/Subject value on
       # its own line, not become a header line of its own.
