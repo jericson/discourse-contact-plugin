@@ -28,12 +28,15 @@ class ContactsController < ApplicationController
     @date = Time.now.strftime("%a, %-d %b %Y %H:%M:%S  %z'")
     @time = Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y %H:%M %p")
 
+    safe_email = sanitize_header_value(contact["email"]).presence || "unknown@example.com"
+    safe_name = sanitize_header_value(contact["name"])
+
     @mail =
       "
 Date: #{@date}
-From: #{contact["email"] || "unknown@example.com"}
+From: #{safe_email}
 To: #{SiteSetting.contact_form_email}
-Subject: Contact from #{contact["name"]} - #{@time}
+Subject: Contact from #{safe_name} - #{@time}
 
 
 Name:  #{contact["name"]}
@@ -65,5 +68,13 @@ Message:
     ContactStore.remove_contact(params[:contact_id])
 
     render json: success_json
+  end
+
+  private
+
+  # Collapse embedded CR/LF characters so untrusted input can't terminate a
+  # header line early and inject additional headers (e.g. Bcc:) into @mail.
+  def sanitize_header_value(value)
+    value.to_s.gsub(/[\r\n]+/, " ").strip
   end
 end
